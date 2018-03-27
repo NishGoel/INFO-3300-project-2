@@ -1,0 +1,67 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r63/three.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="OrbitControls.js"></script>
+</head>
+<body>
+  <div id="container"></div>
+  <script>
+
+      var currmouseX, currmouseY, mouseX, mouseY, clicked = false;
+      var WIDTH = window.innerWidth - 30,
+        HEIGHT = window.innerHeight - 30;
+
+      var container = d3.select("#container").node();
+
+      var camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 3000);
+      camera.position.set(100, 0, 0);
+      var scene = new THREE.Scene();
+
+      var light = new THREE.AmbientLight( 0xffffff, 0.2 );
+
+      scene.add(light);
+
+      var earthGeo = new THREE.SphereGeometry (30, 40, 400),
+        earthMat = new THREE.MeshPhongMaterial();
+
+      // diffuse map
+      earthMat.map = THREE.ImageUtils.loadTexture('world.jpg');
+
+      var earthMesh = new THREE.Mesh(earthGeo, earthMat);
+      earthMesh.position.set(0, 0, 0);
+      earthMesh.rotation.y=5;
+
+      scene.add(earthMesh);
+
+      camera.lookAt( earthMesh.position );
+
+      //renderer
+      var renderer = new THREE.WebGLRenderer({antialiasing : true});
+      renderer.setSize(WIDTH, HEIGHT);
+      renderer.domElement.style.position = 'relative';
+
+      container.append(renderer.domElement);
+      renderer.autoClear = false;
+      renderer.shadowMapEnabled = false;
+
+      function render() {
+        earthMesh.rotation.y += .001;
+        renderer.render(scene, camera);
+      }
+
+      //animation
+      function animate() {
+       requestAnimationFrame(animate);
+       controls.update();
+       render();
+      }
+
+      controls = new THREE.OrbitControls( camera, renderer.domElement);
+      controls.addEventListener('change', render );
+
+      animate();
+  </script>
+</body>
+
+</html>
