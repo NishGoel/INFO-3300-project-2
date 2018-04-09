@@ -7,7 +7,19 @@
   html, body {
     margin: 0;
     padding: 0;
+  }
+  #globe {
+    cursor: move;
     background: #555;
+  }
+  #current {
+    background: white;
+    border: 2px solid black;
+    position: absolute;
+    color: black;
+    font-family: sans-serif;
+    margin-left: 4%;
+    margin-top: 4%;
   }
   </style>
 </head>
@@ -21,12 +33,32 @@
 
   // ms to wait after dragging before auto-rotating
   // scale of the globe (not the canvas element)
-  var scaleFactor = 0.5
+  var scaleFactor = 0.7
   // start angles
-  var angles = { x: 0, y: 40, z: 0}
+  var angles = { x: -20, y: 40, z: 0}
   // colors
   var colorWater = '#fff'
   var colorLand = '#111'
+  var colorGraticule = '#ccc'
+  var colorCountry = '#0ad'
+
+
+  //
+  // Handler
+  //
+
+  function enter(country) {
+    var country = countryList.find(function(c) {
+      return c.id === country.id
+    })
+    current.text(country && country.name || '')
+  }
+
+  function leave(country) {
+    current.text('')
+  }
+
+  //
   // Variables
   //
 
@@ -34,17 +66,28 @@
   var canvas = d3.select('#globe')
   var context = canvas.node().getContext('2d')
   var water = {type: 'Sphere'}
-  var projection = d3.geoOrthographic().precision(0)
-  //var graticule = d3.geoGraticule10()
+  var projection = d3.geoOrthographic().precision(0.1)
+  var graticule = d3.geoGraticule10()
   var path = d3.geoPath(projection).context(context)
   var v0 // Mouse position in Cartesian coordinates at start of drag gesture.
   var r0 // Projection rotation as Euler angles at start.
   var q0 // Projection rotation as versor at start.
   var lastTime = d3.now()
-  var degPerMs = .006
+  var degPerMs = .003;
   var width, height
   var land, countries
-  var autorotate, now, diff
+  var countryList
+  var autorotate, now, diff, roation
+  var currentCountry
+
+  //my variables
+  var oncountry = false;
+  var pause = false;
+  var clickedCountry;
+  var previousScaleFactor = 1;
+  var originalScale;
+  var scalevar;
+  ////////
 
   //
   // Functions
@@ -59,8 +102,10 @@
   }
 
   function scale() {
-    width = document.documentElement.clientWidth
+    width = document.documentElement.clientWidth/2
     height = document.documentElement.clientHeight
+    originalScale = height / 2.1;
+    scalevar = originalScale;
     canvas.attr('width', width).attr('height', height)
     projection
       .scale((scaleFactor * Math.min(width, height)) / 2)
@@ -69,7 +114,9 @@
   }
 
   function startRotation() {
-    autorotate.restart(rotate)
+    if(!pause){
+      autorotate.restart(rotate)
+    }
   }
 
   function stopRotation() {
@@ -98,14 +145,50 @@
   function render() {
     context.clearRect(0, 0, width, height)
     fill(water, colorWater)
-    fill(land, colorLand)
+    stroke(graticule, colorGraticule)
+    fill(countries, colorLand)
+    stroke(borders, "white")
+    if(!pause){
+      if (currentCountry) {
+        fill(currentCountry, colorCountry)
+      }
+    } else{
+      if (clickedCountry) {
+        fill(clickedCountry, colorCountry)
+      }
+    }
   }
 
   function fill(obj, color) {
     context.beginPath()
     path(obj)
-    context.fillStyle = color
-    context.fill()
+    context.fillStyle = color;
+    //context.lineWidth = "2";
+    //context.strokeStyle = "white";
+    //context.stroke();
+    context.fill();
+  }
+
+  function stroke(obj, color) {
+    context.beginPath()
+    path(obj)
+    context.strokeStyle = color
+    context.stroke()
+  }
+
+  function clicked(){
+    if(!pause){
+      if(oncountry){
+        console.log("you are now on a country");
+        clickedCountry = currentCountry;
+        pause = true;
+        stopRotation();
+      }
+    }else{
+      console.log("exiting the country");
+      pause = false;
+      startRotation();
+    }
   }
 
   function rotate(elapsed) {
@@ -121,10 +204,86 @@
   }
 
   function loadData(cb) {
-    d3.json("world-50m.json", function(error, world) {
-        cb(world)
-    });
+    d3.json('custom.geo.json', function(error, world) {
+      if (error) throw error
+      d3.tsv('https://gist.githubusercontent.com/mbostock/4090846/raw/07e73f3c2d21558489604a0bc434b3a5cf41a867/world-country-names.tsv', function(error, countries) {
+        if (error) throw error
+        cb(world, countries)
+      })
+    })
   }
+
+  // https://github.com/d3/d3-polygon
+  function polygonContains(polygon, point) {
+    var n = polygon.length
+    var p = polygon[n - 1]
+    var x = point[0], y = point[1]
+    var x0 = p[0], y0 = p[1]
+    var x1, y1
+    var inside = false
+    for (var i = 0; i < n; ++i) {
+      p = polygon[i], x1 = p[0], y1 = p[1]
+      if (((y1 > y) !== (y0 > y)) && (x < (x0 - x1) * (y - y1) / (y0 - y1) + x1)) inside = !inside
+      x0 = x1, y0 = y1
+    }
+    return inside
+  }
+
+  function mousemove() {
+    var c = getCountry(this)
+    //to make sure that when the object is clicked, only that country is highlighted
+    if(!pause){
+      if (!c) {
+        if (currentCountry) {
+          leave(currentCountry)
+          currentCountry = undefined
+          render()
+        }
+        oncountry = false;
+        return
+      }else if (c === currentCountry) {
+        oncountry = true;
+        return
+      }
+      currentCountry = c;
+      render();
+      enter(c);
+    } else{
+      render();
+      enter(clickedCountry);
+    }
+  }
+
+  function getCountry(event) {
+    var pos = projection.invert(d3.mouse(event))
+    return countries.features.find(function(f) {
+      return f.geometry.coordinates.find(function(c1) {
+        return polygonContains(c1, pos) || c1.find(function(c2) {
+          return polygonContains(c2, pos)
+        })
+      })
+    })
+  }
+
+  function zoom() {
+    context.save();
+    context.clearRect(0, 0, width, height);
+    scaleFactor = d3.event.transform.k;
+    //console.log(scaleFactor);
+    scaleChange = scaleFactor - previousScaleFactor;
+    scalevar = scalevar + (scaleChange * originalScale);
+    projection.scale(scalevar);
+    //console.log(scalevar)
+    //console.log(originalScale)
+    previousScaleFactor = scaleFactor;
+    render();
+    context.restore();
+  }
+
+  //
+  // Initialization
+  //
+
   setAngles()
 
   canvas.call(d3.drag()
@@ -132,15 +291,21 @@
       .on('drag', dragged)
       .on('end', dragended)
      )
+    .on('mousemove', mousemove)
+    .on('click',clicked)
+    .call(d3.zoom().scaleExtent([.5, 3]).on("zoom", zoom));
 
-  loadData(function(world) {
+  loadData(function(world, cList) {
     land = topojson.feature(world, world.objects.land)
     countries = topojson.feature(world, world.objects.countries)
+    borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }),
 
-    window.addEventListener('resize', scale);
-    scale();
-    autorotate = d3.timer(rotate);
-    })
+    countryList = cList
+
+    window.addEventListener('resize', scale)
+    scale()
+    autorotate = d3.timer(rotate)
+  })
   </script>
 </body>
 
