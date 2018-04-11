@@ -9,7 +9,7 @@
     padding: 0;
   }
   #globe {
-    cursor: move;
+    cursor: pointer;
     background: #555;
   }
   #current {
@@ -34,7 +34,7 @@
 
   // ms to wait after dragging before auto-rotating
   // scale of the globe (not the canvas element)
-  var scaleFactor = 0.7
+  var scaleFactor = 0.9 
   // start angles
   var angles = { x: -20, y: 40, z: 0}
   // colors
@@ -305,24 +305,7 @@
                        .x(function(d) { return yearScale(d[0]); })
                        .y(function(d) { return popScale(d[1]); })
 
-
-    var path = svg.append("path")
-                  .attr("d", lineFunction1(resultArray))
-                  .attr("stroke-width", 2)
-                  .attr("fill", "none")
-                  .attr("stroke", "blue");
-
-    var path1 = svg.append("path")
-                  .attr("d", lineFunction2(resultArray))
-                  .attr("stroke-width", 2)
-                  .attr("fill", "none")
-                  .attr("stroke", "red");  
-
-    
-
-     
-
-     svg.selectAll("circle")
+    svg.selectAll("circle")
         .data(pointsarray)
         .enter().append("circle")
         .attr("cx", function(d, i) { return yearScale(pointsarray[0][0]) })
@@ -332,7 +315,7 @@
         .delay(function(d,i){ return i * 50 })
         .attr("cx", function(d, i) { return yearScale(d[0]) })
         .attr("cy", function(d, i) { return popScale(d[1]) })
-        .attr("r", 6); 
+        .attr("r", 4); 
 
     svg.selectAll("circle2")
       .data(pointsarray)
@@ -344,9 +327,25 @@
       .delay(function(d,i){ return i * 50 })
       .attr("cx", function(d, i) { return yearScale(d[0]) })
       .attr("cy", function(d, i) { return fertilityScale(d[2]) })
-      .attr("r", 6); 
+      .attr("r", 4); 
 
-    
+
+    setTimeout(drawPaths(), 800);
+
+   
+
+    function drawPaths() {
+       var path = svg.append("path")
+                  .attr("d", lineFunction1(resultArray))
+                  .attr("stroke-width", 2)
+                  .attr("fill", "none")
+                  .attr("stroke", "blue");
+
+    var path1 = svg.append("path")
+                  .attr("d", lineFunction2(resultArray))
+                  .attr("stroke-width", 2)
+                  .attr("fill", "none")
+                  .attr("stroke", "red");  
 
     var totalLength = path.node().getTotalLength();
 
@@ -363,6 +362,7 @@
         .transition()
           .duration(2000)
           .attr("stroke-dashoffset", 0);
+    }
 }
   function clicked(){
     if(!pause){
