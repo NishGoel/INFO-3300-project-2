@@ -127,31 +127,50 @@ function graphTotals () {
           .attr("fill", "none")
           .attr("stroke-width", 3)
           .attr("stroke", "black")
-          .transition()
-          .duration(500)
           .attr("stroke-width", 3)
           .attr("fill", "none")
           .attr("stroke", "black")
-          //.on("start", drawLine);
-          //.attrTween("d", pathTween(lineFunction))
-          //.attrTween("d", lineFunction(totals));
+
+    /////////////////animations/////////////////////////////////////////////////////
+      var pointsarray = [];
+      totals.forEach(function(d){
+        if(d[0] % 10 == 0) pointsarray.push(d);
+      })
+
+      //console.log(pointsarray);
+
+      var circle = svg.selectAll("circle")
+                  .data(pointsarray)
+                  .enter().append("circle")
+                  .attr("cx", function(d, i) { return scaleX(pointsarray[0][0]) })
+                  .attr("cy", function(d, i) { return scaleY(pointsarray[0][1]) })
+                  .style("fill","red")
+                  .transition()
+                  .delay(function(d,i){ return i * 50 })
+                  .attr("cx", function(d, i) { return scaleX(d[0]) })
+                  .attr("cy", function(d, i) { return scaleY(d[1]) })
+                  .attr("r", 6);
+
+
 
     var totalLength = path.node().getTotalLength();
 
-    path
-        .attr("stroke-dasharray", totalLength + " " + totalLength)
+    path.attr("stroke-dasharray", totalLength + " " + totalLength)
         .attr("stroke-dashoffset", totalLength)
         .transition()
           .duration(2000)
           .attr("stroke-dashoffset", 0);
-}
 
+    /////////////////animations/////////////////////////////////////////////////////
+}
+/*
 function pathTween(line) {
   var interpolate = d3.interpolateArray(totals[0], totals[totals.length-1]);
   return function(t) {
       return line(totals.slice(0, interpolate(t)));
   };
 }
+*/
 
 
 
