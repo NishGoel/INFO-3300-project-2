@@ -198,7 +198,7 @@ function buildScatterPlot(countryname, fertility, population){
         focus.select("text.y1")
             .attr("transform",
             "translate(" + yearScale(d[0] ) + ",10)")
-            .text("Population: " + d[1]); 
+            .text("Population: " + (d[1]/1000000).toFixed(2) + " million"); 
         
         focus.select("text.y2")
             .attr("transform",
