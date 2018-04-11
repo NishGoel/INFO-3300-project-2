@@ -92,8 +92,8 @@ function callback(error, data) {
   graphTotals();
 
 }
-d3.csv("Nishant/country_center_coordinates.csv", mutateRow, callback2)
-d3.csv("Matthew/indicator_gapminder_population.csv", mutateRow, callback);
+d3.csv("../Nishant/country_center_coordinates.csv", mutateRow, callback2)
+d3.csv("indicator_gapminder_population.csv", mutateRow, callback);
 function graphTotals () {
   var margin = {top: 20, right: 20, bottom: 30, left: 170},
     width = 960 - margin.left - margin.right,
