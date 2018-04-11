@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>HTML/JS/D3 -> R</title>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+  <div id = "svgTimeSeries"></div>
+<script>
+
+/**
+  Recreate the following steps in R using dplyr and ggplot.
+  Look at the comments for names that may suggest interesting functions.
+  Your R code should be much shorter.
+  */
+
+var temperatures, yearSummary;
+var years = [1800,1810,1820,1830,1840,1850,1860,1870,1880,1890,1900,1910,1920,1930,1940,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015];
+var population = {};
+var coordinates = {};
+var totals = [];
+
+function mutateRow(row) {
+  return row;
+}
+
+function addToDict (dict, year, country , pop) {
+  tmp = dict[year];
+  var x = {}
+  if (country in coordinates) {
+    coord = coordinates[country]
+    stuff = coord.split(',');
+    latitude = stuff[0].trim();
+    latitude = latitude.substring(0,latitude.length-1);
+    latitude = latitude.trim().replace(/ /g,".");
+
+    longitude = stuff[1].trim();
+    longitude = longitude.substring(0,longitude.length-1);
+    longitude = longitude.trim().replace(/ /g,".");
+    x = parseInt(pop.replace(/,/g, ''));
+    tmp[country] = x;
+  }
+  else {
+    tmp[country] = parseInt(pop.replace(/,/g, ''));
+  }
+
+  dict[year] = tmp;
+  return dict;
+}
+
+function callback2(error, data) {
+  var dict = {};
+  data.forEach(function(element) {
+     cName = element["Country"];
+     cCoord = element["Coordinates"];
+     if (cName.indexOf(',') > -1) {
+      cName = cName.split(',');
+      cName = cName[1].trim() + " " + cName[0].trim();
+      cName = cName.replace(/"/g,"");
+    }
+    dict[cName] = cCoord;
+  });
+  coordinates = dict;
+}
+
+function callback(error, data) {
+  var dict = {}; // {Year, {Country, {Latitude, Longitude, Population Size, Color}}}
+  data.forEach(function(element) {
+     for(year in years) {
+        if (years[year] in dict) {
+          dict = addToDict(dict, years[year], element["Country"], element[years[year]]);
+        }
+        else {
+          var x = {};
+          x[element["Country"]] = element[years[year]];
+          dict[years[year]] = x;
+        }
+    }
+  });
+  population = dict;
+  for (var key in population) {
+    total = 0;
+    for (var country in population[key]) {
+      if (population[key][country].toString() == "NaN" || population[key][country].toString() == "") {
+        delete population[key][country];
+      }
+      else {
+        total += population[key][country]
+      }
+    }
+    totals.push([parseInt(key),total]);
+  }
+  graphTotals();
+
+}
+d3.csv("Nishant/country_center_coordinates.csv", mutateRow, callback2)
+d3.csv("Matthew/indicator_gapminder_population.csv", mutateRow, callback);
+function graphTotals () {
+  var margin = {top: 20, right: 20, bottom: 30, left: 170},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+  var svg = d3.select("#svgTimeSeries").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  var scaleX = d3.scaleLinear().range([0,width]);
+  var scaleY = d3.scaleLinear().range([height, 0]);
+
+  scaleX.domain([1800,2015]);
+  scaleY.domain([947563473, 7326066200]);
+
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(scaleX).tickFormat(d3.format("d"))); //from StackOverflow
+
+    svg.append("g")
+      .call(d3.axisLeft(scaleY));
+
+    var lineFunction = d3.line()
+                       .x(function(d) { return scaleX(d[0]); })
+                       .y(function(d) { return scaleY(d[1]); })
+
+
+    var path = svg.append("path")
+          .attr("d", lineFunction(totals))
+          .attr("fill", "none")
+          .attr("stroke-width", 3)
+          .attr("stroke", "black")
+          .transition()
+          .duration(500)
+          .attr("stroke-width", 3)
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          //.on("start", drawLine);
+          //.attrTween("d", pathTween(lineFunction))
+          //.attrTween("d", lineFunction(totals));
+
+    var totalLength = path.node().getTotalLength();
+
+    path
+        .attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+          .duration(2000)
+          .attr("stroke-dashoffset", 0);
+}
+
+function pathTween(line) {
+  var interpolate = d3.interpolateArray(totals[0], totals[totals.length-1]);
+  return function(t) {
+      return line(totals.slice(0, interpolate(t)));
+  };
+}
+
+
+
+</script>
+</body>
+</html>
