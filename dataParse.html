@@ -118,16 +118,29 @@ function graphTotals () {
     svg.append("g")
       .call(d3.axisLeft(scaleY));
 
-    console.log(totals);
     var lineFunction = d3.line()
                        .x(function(d) { return scaleX(d[0]); })
                        .y(function(d) { return scaleY(d[1]); })
 
      svg.append("path")
           .attr("d", lineFunction(totals))
-          .attr("stroke-width", 5)
           .attr("fill", "none")
-          .attr("stroke", "black");
+          .attr("stroke-width", 3)
+          .attr("stroke", "black")
+          .transition()
+          .duration(500)
+          .attr("stroke-width", 3)
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attrTween("d", pathTween(lineFunction))
+          //.attrTween("d", lineFunction(totals));
+}
+
+function pathTween(line) {
+  var interpolate = d3.interpolateArray(totals[0], totals[totals.length-1]);
+  return function(t) {
+      return line(totals.slice(0, interpolate(t)));
+  };
 }
 
 
