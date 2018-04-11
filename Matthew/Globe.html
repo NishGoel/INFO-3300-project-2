@@ -34,7 +34,7 @@
 
   // ms to wait after dragging before auto-rotating
   // scale of the globe (not the canvas element)
-  var scaleFactor = 0.9 
+  var scaleFactor = 0.9
   // start angles
   var angles = { x: -20, y: 40, z: 0}
   // colors
@@ -224,7 +224,7 @@
 
 
 
-  
+
 
   var margin = {top: 30, right: 60, bottom: 30, left: 30},
     width = document.documentElement.clientWidth/2 - margin.left - margin.right,
@@ -234,7 +234,7 @@
   var yearExtent = d3.extent(years);
 
   yearPop = d3.extent(yearPop);
-  
+
   var yearScale = d3.scaleLinear()
   .domain([1950,2015])
   .range([0, width]);
@@ -256,7 +256,7 @@
   .domain([0, 1400000000])
   .range([height,0]);
   }
-  
+
 
   var fertilityScale = d3.scaleLinear()
   .domain([0,10])
@@ -264,7 +264,7 @@
 
   var translateAmount = Number(document.documentElement.clientWidth/2) + margin.left ;
   d3.select("#graph").remove();
- 
+
   var svg = d3.select("#svgTimeSeries").append("svg")
     .attr("id","graph")
     .attr("width", width + margin.left + margin.right)
@@ -299,7 +299,7 @@
     var lineFunction1 = d3.line()
                        .x(function(d) { return yearScale(d[0]); })
                        .y(function(d) { return fertilityScale(d[2]); })
-    
+
 
     var lineFunction2 = d3.line()
                        .x(function(d) { return yearScale(d[0]); })
@@ -315,7 +315,7 @@
         .delay(function(d,i){ return i * 50 })
         .attr("cx", function(d, i) { return yearScale(d[0]) })
         .attr("cy", function(d, i) { return popScale(d[1]) })
-        .attr("r", 4); 
+        .attr("r", 4);
 
     svg.selectAll("circle2")
       .data(pointsarray)
@@ -327,12 +327,12 @@
       .delay(function(d,i){ return i * 50 })
       .attr("cx", function(d, i) { return yearScale(d[0]) })
       .attr("cy", function(d, i) { return fertilityScale(d[2]) })
-      .attr("r", 4); 
+      .attr("r", 4);
 
 
     setTimeout(drawPaths(), 800);
 
-   
+
 
     function drawPaths() {
        var path = svg.append("path")
@@ -345,7 +345,7 @@
                   .attr("d", lineFunction2(resultArray))
                   .attr("stroke-width", 2)
                   .attr("fill", "none")
-                  .attr("stroke", "red");  
+                  .attr("stroke", "red");
 
     var totalLength = path.node().getTotalLength();
 
@@ -354,7 +354,7 @@
         .transition()
           .duration(2000)
           .attr("stroke-dashoffset", 0);
-    
+
     var totalLength = path1.node().getTotalLength();
 
     path1.attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -369,9 +369,9 @@
       if(oncountry){
         //console.log("you are now on a country");
         clickedCountry = currentCountry;
-        buildScatterPlot(countryName,fertility,population)
         pause = true;
         stopRotation();
+        buildScatterPlot(countryName,fertility,population);
       }
     }else{
       //console.log("exiting the country");
@@ -405,11 +405,11 @@
         element[years[year]] = element[years[year]].replace(/[,]/g,"");
         element[years[year]] = element[years[year]].replace(/ /g,'');
         tmp[years[year]] = Number(element[years[year]]);
-    
+
         }
       }
       dict[element["Country"]] = tmp;
-  });  
+  });
   population = dict;
 
   var dict2 = {}; // {Year, {Country, {Latitude, Longitude, Population Size, Color}}}
@@ -419,11 +419,11 @@
       if (years[year] >= 1950){
         element[years[year]] = element[years[year]].replace(/[,]/g,"");
         element[years[year]] = element[years[year]].replace(/ /g,'');
-        tmp2[years[year]] = Number(element[years[year]]); 
+        tmp2[years[year]] = Number(element[years[year]]);
         }
       }
       dict2[element["Country"]] = tmp2;
-  });  
+  });
   fertility = dict2;
 
 
