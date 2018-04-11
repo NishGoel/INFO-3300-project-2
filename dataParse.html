@@ -7,7 +7,7 @@
   <div id = "svgTimeSeries"></div>
 <script>
 
-/** 
+/**
   Recreate the following steps in R using dplyr and ggplot.
   Look at the comments for names that may suggest interesting functions.
   Your R code should be much shorter.
@@ -32,7 +32,7 @@ function addToDict (dict, year, country , pop) {
     latitude = stuff[0].trim();
     latitude = latitude.substring(0,latitude.length-1);
     latitude = latitude.trim().replace(/ /g,".");
-   
+
     longitude = stuff[1].trim();
     longitude = longitude.substring(0,longitude.length-1);
     longitude = longitude.trim().replace(/ /g,".");
@@ -42,17 +42,17 @@ function addToDict (dict, year, country , pop) {
   else {
     tmp[country] = parseInt(pop.replace(/,/g, ''));
   }
-  
+
   dict[year] = tmp;
   return dict;
-} 
+}
 
 function callback2(error, data) {
   var dict = {};
   data.forEach(function(element) {
      cName = element["Country"];
      cCoord = element["Coordinates"];
-     if (cName.indexOf(',') > -1) { 
+     if (cName.indexOf(',') > -1) {
       cName = cName.split(',');
       cName = cName[1].trim() + " " + cName[0].trim();
       cName = cName.replace(/"/g,"");
@@ -87,7 +87,7 @@ function callback(error, data) {
         total += population[key][country]
       }
     }
-    totals.push([parseInt(key),total]);  
+    totals.push([parseInt(key),total]);
   }
   graphTotals();
 
@@ -98,7 +98,7 @@ function graphTotals () {
   var margin = {top: 20, right: 20, bottom: 30, left: 170},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
- 
+
   var svg = d3.select("#svgTimeSeries").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -122,8 +122,9 @@ function graphTotals () {
                        .x(function(d) { return scaleX(d[0]); })
                        .y(function(d) { return scaleY(d[1]); })
 
-     svg.append("path")
-          //.attr("d", lineFunction(totals))
+
+    var path = svg.append("path")
+          .attr("d", lineFunction(totals))
           .attr("fill", "none")
           .attr("stroke-width", 3)
           .attr("stroke", "black")
@@ -132,8 +133,18 @@ function graphTotals () {
           .attr("stroke-width", 3)
           .attr("fill", "none")
           .attr("stroke", "black")
-          .attrTween("d", pathTween(lineFunction))
+          //.on("start", drawLine);
+          //.attrTween("d", pathTween(lineFunction))
           //.attrTween("d", lineFunction(totals));
+
+    var totalLength = path.node().getTotalLength();
+
+    path
+        .attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+          .duration(2000)
+          .attr("stroke-dashoffset", 0);
 }
 
 function pathTween(line) {
@@ -144,7 +155,7 @@ function pathTween(line) {
 }
 
 
- 
+
 </script>
 </body>
 </html>
