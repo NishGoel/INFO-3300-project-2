@@ -123,7 +123,7 @@ function graphTotals () {
                        .y(function(d) { return scaleY(d[1]); })
 
      svg.append("path")
-          .attr("d", lineFunction(totals))
+          //.attr("d", lineFunction(totals))
           .attr("fill", "none")
           .attr("stroke-width", 3)
           .attr("stroke", "black")

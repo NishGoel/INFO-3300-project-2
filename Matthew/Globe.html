@@ -24,6 +24,7 @@
   </style>
 </head>
 <body>
+  <div id = "svgTimeSeries" style="float: right"><svg id = "graph" > </svg></div>
   <h2 id="current"></h2>
   <canvas id="globe"></canvas>
   <script>
@@ -183,14 +184,136 @@
     context.strokeStyle = color
     context.stroke()
   }
+  function buildScatterPlot(countryname, fertility, population){
 
+  console.log("function has been called");
+  //console.log(fertility);
+  //console.log(population);
+
+  //console.log(population[countryname]);
+
+  var times = Object.keys(population[countryname]);
+  var pops = Object.values(population[countryname]);
+  var babies = Object.values(fertility[countryname]);
+
+  //console.log(times);
+  //console.log(pops);
+  //console.log(babies);
+
+  var element1;
+  var element2;
+  var element3;
+
+  var resultArray = []
+  var tempArray = []
+  var yearFert = []
+  var yearPop = []
+  for (year in years){
+    tempArray = []
+    element1 = Number(times[year]);
+    tempArray.push(element1);
+    element2 = Number(pops[year]);
+    yearPop.push(element2);
+    tempArray.push(element2);
+    element3 = Number(babies[year]);
+    yearFert.push(element3)
+    tempArray.push(element3);
+
+    resultArray.push(tempArray);
+  }
+
+
+
+  
+
+  var margin = {top: 30, right: 60, bottom: 30, left: 30},
+    width = document.documentElement.clientWidth/2 - margin.left - margin.right,
+    height = document.documentElement.clientHeight - margin.top - margin.bottom;
+
+
+  var yearExtent = d3.extent(years);
+
+  yearPop = d3.extent(yearPop);
+  
+  var yearScale = d3.scaleLinear()
+  .domain([1950,2015])
+  .range([0, width]);
+
+  var popScale;
+  console.log(yearPop[1]);
+  if (yearPop[1] < 10000000) {
+    var popScale = d3.scaleLinear()
+                    .domain([0, 10000000])
+                    .range([height,0]);
+  }
+  else if (yearPop[1] < 100000000) {
+    var popScale = d3.scaleLinear()
+  .domain([0, 100000000])
+  .range([height,0]);
+  }
+  else {
+    var popScale = d3.scaleLinear()
+  .domain([0, 1400000000])
+  .range([height,0]);
+  }
+  
+
+  var fertilityScale = d3.scaleLinear()
+  .domain([0,10])
+  .range([height,0])
+
+  var translateAmount = Number(document.documentElement.clientWidth/2) + margin.left ;
+  d3.select("#graph").remove();
+ 
+  var svg = d3.select("#svgTimeSeries").append("svg")
+    .attr("id","graph")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+          "translate("  + margin.left  + "," + margin.top + ")");
+
+
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(yearScale).tickFormat(d3.format("d"))); //from StackOverflow
+
+    svg.append("g")
+      .call(d3.axisLeft(fertilityScale).tickFormat(d3.format("d")));
+
+    svg.append("g")
+      .attr("transform", "translate( " + width + ", 0 )")
+      .call(d3.axisRight(popScale).tickFormat(function(d){
+        return String(d/1000000000) + " billion";
+      }));
+
+    var lineFunction1 = d3.line()
+                       .x(function(d) { return yearScale(d[0]); })
+                       .y(function(d) { return fertilityScale(d[2]); })
+
+    var lineFunction2 = d3.line()
+                       .x(function(d) { return yearScale(d[0]); })
+                       .y(function(d) { return popScale(d[1]); })
+
+
+    svg.append("path")
+          .attr("d", lineFunction1(resultArray))
+          .attr("stroke-width", 5)
+          .attr("fill", "none")
+          .attr("stroke", "blue");
+
+    svg.append("path")
+          .attr("d", lineFunction2(resultArray))
+          .attr("stroke-width", 5)
+          .attr("fill", "none")
+          .attr("stroke", "red");   
+}
   function clicked(){
     if(!pause){
       if(oncountry){
         //console.log("you are now on a country");
         clickedCountry = currentCountry;
-        console.log(population[countryName]);
-        console.log(fertility[countryName]);
+        buildScatterPlot(countryName,fertility,population)
         pause = true;
         stopRotation();
       }
@@ -220,31 +343,33 @@
   function population_fertility_data(error, pop_data, fertility_data) {
     var dict = {}; // {Year, {Country, {Latitude, Longitude, Population Size, Color}}}
     pop_data.forEach(function(element) {
-      tmp = {}
-      for(year in years) {
-        if (years[year] >= 1950){
-          arr1 = [];
-          arr1.push(element[years[year]]);
-          tmp[years[year]] = arr1;
-          }
-          dict[element["Country"]] = tmp;
+    tmp = {};
+    for(year in years) {
+      if (years[year] >= 1950){
+        element[years[year]] = element[years[year]].replace(/[,]/g,"");
+        element[years[year]] = element[years[year]].replace(/ /g,'');
+        tmp[years[year]] = Number(element[years[year]]);
+    
         }
-    });
-    population = dict;
+      }
+      dict[element["Country"]] = tmp;
+  });  
+  population = dict;
 
-    var dict2 = {}; // {Year, {Country, {Latitude, Longitude, Population Size, Color}}}
-    fertility_data.forEach(function(element) {
-      tmp2 = {}
-      for(year in years) {
-        if (years[year] >= 1950){
-          arr2 = [];
-          arr2.push(element[years[year]]);
-          tmp2[years[year]] = arr2;
-          }
-          dict2[element["Country"]] = tmp2;
+  var dict2 = {}; // {Year, {Country, {Latitude, Longitude, Population Size, Color}}}
+  fertility_data.forEach(function(element) {
+    tmp2 = {}
+    for(year in years) {
+      if (years[year] >= 1950){
+        element[years[year]] = element[years[year]].replace(/[,]/g,"");
+        element[years[year]] = element[years[year]].replace(/ /g,'');
+        tmp2[years[year]] = Number(element[years[year]]); 
         }
-    });
-    fertility = dict2;
+      }
+      dict2[element["Country"]] = tmp2;
+  });  
+  fertility = dict2;
+
 
   }
 
@@ -293,6 +418,7 @@
         return
       }else if (c === currentCountry) {
         oncountry = true;
+
         return
       }
       currentCountry = c;
@@ -335,6 +461,9 @@
   //
 
   setAngles()
+  d3.queue()
+.defer(d3.csv, "../Nishant/indicator_gapminder_population.csv")
+.defer(d3.csv, "../Nishant/gapminder_children_per_woman_data.csv")
 
   canvas.call(d3.drag()
       .on('start', dragstarted)
