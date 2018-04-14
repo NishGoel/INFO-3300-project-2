@@ -24,10 +24,11 @@
   </style>
 </head>
 <body>
-  <!--<div id = "svgSlider"><svg id = "slider" > </svg></div>-->
+
   <div id = "svgTimeSeries" style="float: right"><svg id = "graph" > </svg></div>
   <h2 id="current"></h2>
   <canvas id="globe"></canvas>
+  <div id = "svgSlider"></div>
   <script>
   //
   // Configuration
@@ -92,6 +93,7 @@
   var originalScale;
   var scalevar;
   var countryName;
+  var currentYear = 1950;
   ////////
 
   //data Variables
@@ -116,7 +118,7 @@
     height = (document.documentElement.clientHeight)*.8
     originalScale = height / 2.1;
     scalevar = originalScale;
-    canvas.attr('width', width).attr('height', height)
+    canvas.attr('width', width).attr('height', height).attr('x',0).attr('y',0);
     projection
       .scale((scaleFactor * Math.min(width, height)) / 2)
       .translate([width / 2, height / 2])
@@ -152,11 +154,13 @@
     startRotation()
   }
 
+  //for shading of the countries
+
   function render() {
     context.clearRect(0, 0, width, height)
     fill(water, colorWater)
     stroke(graticule, colorGraticule)
-    fill(countries, colorLand)
+    countryFill(countries,currentYear);
     stroke(borders, "white")
     if(!pause){
       if (currentCountry) {
@@ -168,11 +172,34 @@
       }
     }
   }
+  var color = d3.scaleLinear().domain([1,10])
+      .interpolate(d3.interpolateHcl)
+      .range([d3.rgb("#E500C8"), d3.rgb('#ECEC09')]);
 
-  function(){
+  function countryFill(countries,year){
+    var fillcolor = '';
+    countries["features"].forEach(function(d){
+      var speccountry = countryList.find(function(c) {
+        return c.id === d.id;
+      })
+      try{
+        fillcolor = color(fertility[speccountry.name][year]);
+      } catch(error){
+        //console.log(error)
+        fillcolor = "black";
+      }
+      fill(d,fillcolor);
+    })
+  }
+
+
+  function buildSlider(){
+    var svgwidth = document.documentElement.clientWidth/2;
+    var svgheight = (document.documentElement.clientHeight)*.2;
 
   }
 
+//////////////////////////////////////////////////////////////////////
   function fill(obj, color) {
     context.beginPath()
     path(obj)
@@ -446,8 +473,6 @@
             .attr("transform",
             "translate(" + yearScale(d[0] + 6 ) + ",10)")
 
-
-
                                                           // **********
     }
 
@@ -655,8 +680,9 @@
     countryList = cList
 
     window.addEventListener('resize', scale)
-    scale()
-    autorotate = d3.timer(rotate)
+    scale();
+    buildSlider();
+    autorotate = d3.timer(rotate);
   })
   </script>
 </body>
