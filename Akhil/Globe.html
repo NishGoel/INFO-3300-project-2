@@ -332,6 +332,16 @@
 
 	//legend
 
+	//Graph Title
+	svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margin.top / 2)+10)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text(countryname);
+        //Graph Title
+
     var pointsarray = [];
       resultArray.forEach(function(d){
         if(d[0] % 5 == 0) pointsarray.push(d);
