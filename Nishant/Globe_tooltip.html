@@ -184,6 +184,8 @@
     context.strokeStyle = color
     context.stroke()
   }
+  
+
   function buildScatterPlot(countryname, fertility, population){
 
   //console.log("function has been called");
@@ -221,9 +223,6 @@
 
     resultArray.push(tempArray);
   }
-
-
-
 
 
   var margin = {top: 30, right: 60, bottom: 30, left: 30},
@@ -272,9 +271,6 @@
     .append("g")
     .attr("transform",
           "translate("  + margin.left  + "," + margin.top + ")");
-
-
-
 
 
 
@@ -471,7 +467,6 @@
     }
 
 
-
     function drawPaths() {
        var path = svg.append("path")
                   .attr("d", lineFunction1(resultArray))
@@ -502,6 +497,10 @@
           .attr("stroke-dashoffset", 0);
     }
 }
+
+
+  
+
   function clicked(){
     if(!pause){
       if(oncountry){
@@ -564,8 +563,21 @@
   });
   fertility = dict2;
 
+  var worldPopulation = []
+
+  for (year in years){
+    countryArray = Object.keys(population);
+    for (country in countryArray){
+      var yearPop += population[countryArray[country]][years[year]];
+      var arr = []
+      arr.push(years[year]);
+      arr.push(yearPop);
+      worldPopulation.push(arr);
+    }
 
   }
+}
+
 
   function loadData(cb) {
     d3.json('custom.geo.json', function(error, world) {
