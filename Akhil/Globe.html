@@ -25,7 +25,8 @@
   </style>
 </head>
 <body>
-  <div id = "svgTimeSeries" style="float: right"><svg id = "graph" > </svg></div>
+  <div id = "initial"></div>
+  <div id = "svgTimeSeries" style="float: right"></div>
   <h2 id="current"></h2>
   <canvas id="globe"></canvas>
   <script>
@@ -187,19 +188,10 @@
   }
   function buildScatterPlot(countryname, fertility, population){
 
-  console.log("function has been called");
-  //console.log(fertility);
-  //console.log(population);
-
-  //console.log(population[countryname]);
-
   var times = Object.keys(population[countryname]);
   var pops = Object.values(population[countryname]);
   var babies = Object.values(fertility[countryname]);
 
-  //console.log(times);
-  //console.log(pops);
-  //console.log(babies);
 
   var element1;
   var element2;
@@ -221,6 +213,7 @@
     tempArray.push(element3);
 
     resultArray.push(tempArray);
+    //console.log(resultArray);
   }
 
 
@@ -229,10 +222,7 @@
 
   var margin = {top: 30, right: 60, bottom: 40, left: 35}, //changed this
     width = document.documentElement.clientWidth/2 - margin.left - margin.right,
-    height = document.documentElement.clientHeight - margin.top - margin.bottom;
-
-
-  var yearExtent = d3.extent(years);
+    height = document.documentElement.clientHeight/2 - margin.top - margin.bottom;
 
   yearPop = d3.extent(yearPop);
 
@@ -581,7 +571,7 @@
     return row;
   }
 
-  function population_fertility_data(error, pop_data, fertility_data) {
+  function population_fertility_data(error, pop_data, fertility_data, world_fertility_data) {
     var dict = {}; // {Year, {Country, {Latitude, Longitude, Population Size, Color}}}
     pop_data.forEach(function(element) {
     tmp = {};
@@ -611,8 +601,302 @@
   });
   fertility = dict2;
 
+  var worldData = []
 
+  for (year in years){
+    countryArray = Object.keys(population);
+    var yearPop = 0;
+    for (country in countryArray){
+      //console.log(population[countryArray[country]][years[year]]);
+     
+      yearPop = yearPop +  population[countryArray[country]][years[year]];
+    }
+    var arr = []
+    arr.push(years[year]);
+    arr.push(yearPop);
+    worldData.push(arr);
+    //console.log(worldPopulation);
   }
+
+  dataworks = world_fertility_data;
+    for (year in years){
+      worldData[year].push(Number(world_fertility_data[year]['Fertility rate']));
+    }
+
+  console.log(worldData);
+
+  createInitialGraph(worldData);	
+
+  function createInitialGraph(worldData) {
+
+  	width = document.documentElement.clientWidth;
+  	height = document.documentElement.clientHeight;
+  	document.getElementById("initial").style.width = width;
+  	document.getElementById("initial").style.height = height;
+  	var margins = {top: 30, right: 60, bottom: 40, left: 35}, //changed this
+    width = document.documentElement.clientWidth - margins.left - margins.right,
+    height = document.documentElement.clientHeight/2 - margins.top - margins.bottom;
+  	var svg = d3.select("#initial").append("svg")
+			    .attr("width", width + margins.left + margins.right)
+			    .attr("height", height + margins.top + margins.bottom)
+			    .append("g")
+			    .attr("transform",
+			          "translate("  + margins.left  + "," + margins.top + ")");
+
+	var yearScale = d3.scaleLinear()
+					  .domain([1950,2015])
+					  .range([0, width]);
+
+	var popScale = d3.scaleLinear()
+	                    .domain([0, 7500000000])
+	                    .range([height,0]);
+	  
+	var fertilityScale = d3.scaleLinear()
+	  .domain([0,10])
+	  .range([height,0])
+
+	svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(yearScale).tickFormat(d3.format("d"))); //from StackOverflow
+
+    svg.append("g")
+      .call(d3.axisLeft(fertilityScale).tickFormat(d3.format("d")));
+
+    svg.append("g")
+      .attr("transform", "translate( " + width + ", 0 )")
+      .call(d3.axisRight(popScale).tickFormat(function(d){
+        return String(d/1000000000) + " B";
+      }));
+
+//labels
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margins.left - 2)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Fertility Rate");
+
+    svg.append("text")     
+      .attr("y", 0 - margins.right - width +16.5)
+      .attr("x",(height / 2))
+      .attr("transform", "rotate(90)")
+      .style("text-anchor", "middle")
+      .text("Population (in Billions)");
+
+      svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height +33) + ")")
+      .style("text-anchor", "middle")
+      .text("Year");
+      // labels
+
+      //legend
+
+      var legend_keys = ["Population", "Fertility"]
+      var color_scale = ["red", "blue"]
+
+	var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
+	    .enter().append("g")
+	    .attr("class","lineLegend")
+	    .attr("transform", function (d,i) {
+	            return "translate(" + margins.left + "," + (i*20)+")";
+	        });
+
+	lineLegend.append("text").text(function (d) {return d;})
+	    .attr("transform", "translate(15,9)"); //align texts with boxes
+
+	lineLegend.append("rect")
+	    .attr("fill", function (d, i) {return color_scale[i]; })
+	    .attr("width", 10).attr("height", 10);
+
+	//legend
+
+		//Graph Title
+	svg.append("text")
+        .attr("x", (width / 2))             
+        .attr("y", 0 - (margins.top / 2)+10)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px") 
+        .style("text-decoration", "underline")  
+        .text("World Data");
+        //Graph Title
+
+	var pointsarray = [];
+	var pointsarray2 = [];
+      worldData.forEach(function(d){
+        if(d[0] % 5 == 0) pointsarray.push(d);
+      })
+      console.log(pointsarray)
+
+    var lineFunction1 = d3.line()
+                       .x(function(d) { return yearScale(d[0]); })
+                       .y(function(d) { return fertilityScale(d[2]); })
+
+
+    var lineFunction2 = d3.line()
+                       .x(function(d) { return yearScale(d[0]); })
+                       .y(function(d) { return popScale(d[1]); })
+
+    svg.selectAll("circle")
+        .data(pointsarray)
+        .enter().append("circle")
+        .attr("cx", function(d, i) { return yearScale(pointsarray[0][0]) })
+        .attr("cy", function(d, i) { return popScale(pointsarray[0][1]) })
+        .style("fill","red")
+        .transition()
+        .delay(function(d,i){ return i * 60 })
+        .attr("cx", function(d, i) { return yearScale(d[0]) })
+        .attr("cy", function(d, i) { return popScale(d[1]) })
+        .attr("r", 4);
+
+    svg.selectAll("circle2")
+      .data(pointsarray)
+      .enter().append("circle")
+      .attr("cx", function(d, i) { return yearScale(pointsarray[0][0]) })
+      .attr("cy", function(d, i) { return fertilityScale(pointsarray[0][2]) })
+      .style("fill","blue")
+      .transition()
+      .delay(function(d,i){ return i * 60 })
+      .attr("cx", function(d, i) { return yearScale(d[0]) })
+      .attr("cy", function(d, i) { return fertilityScale(d[2]) })
+      .attr("r", 4);
+
+     setTimeout(drawPaths, 200);
+
+    function drawPaths() {
+     var path = svg.append("path")
+                  .attr("d", lineFunction1(worldData))
+                  .attr("stroke-width", 2)
+                  .attr("fill", "none")
+                  .attr("stroke", "blue");
+
+    var path1 = svg.append("path")
+                  .attr("d", lineFunction2(worldData))
+                  .attr("stroke-width", 2)
+                  .attr("fill", "none")
+                  .attr("stroke", "red");
+
+    var totalLength = path.node().getTotalLength();
+
+    path.attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+          .duration(2000)
+          .attr("stroke-dashoffset", 0);
+
+    var totalLength = path1.node().getTotalLength();
+
+    path1.attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+          .duration(2000)
+          .attr("stroke-dashoffset", 0);
+    }
+
+    var div = document.createElement("div");
+	div.style.width = "200px";
+	div.style.height = "75";
+	div.style.background = "white";
+	div.style.position = "absolute";
+	div.style.color = "red";
+	div.style.zIndex = 3;
+	div.style.left = 100;
+	div.style.top = 220;
+	div.innerHTML = "We want to tell a story about the world population and fertility rate";
+	div.style.opacity = 0;
+	document.getElementById("initial").appendChild(div); 
+	setTimeout(function() { unfade(div);}, 100);
+	var div1 = document.createElement("div");
+	div1.style.width = "200px";
+	div1.style.height = "75";
+	div1.style.background = "white";
+	div1.style.position = "absolute";
+	div1.style.color = "red";
+	div1.style.zIndex = 3;
+	div1.style.left = 600;
+	div1.style.top = 300;
+	div1.innerHTML = "Post WWII, fertility rates were at an all time high, even here in America with the return of the baby boomers";
+	div1.style.opacity = 0;
+	document.getElementById("initial").appendChild(div1);
+	setTimeout(function() { unfade(div1);}, 2500);
+	var div2 = document.createElement("div");
+	div2.style.width = "200px";
+	div2.style.height = "75";
+	div2.style.background = "white";
+	div2.style.position = "absolute";
+	div2.style.color = "red";
+	div2.style.zIndex = 3;
+	div2.style.left = 100;
+	div2.style.top = 475;
+	div2.innerHTML = "Soon after fertility rates quickly dropped, but population continued to grow at massive rates";
+	div2.style.opacity = 0;
+	document.getElementById("initial").appendChild(div2); 
+	setTimeout(function() { unfade(div2);}, 5000);
+	var div3 = document.createElement("div");
+	div3.style.width = "200px";
+	div3.style.height = "75";
+	div3.style.background = "white";
+	div3.style.position = "absolute";
+	div3.style.color = "red";
+	div3.style.zIndex = 3;
+	div3.style.left = 600;
+	div3.style.top = 575;
+	div3.style.opacity = 0;
+	div3.innerHTML = "The world blames developing countries for not adjusting and causing this pandemic, but our charts will show you otherwise";
+	setTimeout(function() { unfade(div3);}, 7500);
+	document.getElementById("initial").appendChild(div3); 
+	h = height+ margins.top+margins.bottom;
+	setTimeout(function() { scrollDown(h);}, 8000);
+	
+  }
+  //
+
+}
+function unfade(element) { //from StackOverflow
+    var op = 0.1;  // initial opacity
+    element.style.display = 'block';
+    var timer = setInterval(function () {
+        if (op >= 1){
+            clearInterval(timer);
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op += op * 0.1;
+    }, 10);
+    setTimeout(function() {
+	    fade(element);
+	}, 2900)
+}
+
+function fade(element) {
+    var op = 1;  // initial opacity
+    var timer = setInterval(function () {
+        if (op <= 0.1){
+            clearInterval(timer);
+            element.style.display = 'none';
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op -= op * 0.1;
+    }, 50);
+
+}
+
+function scrollDown(h) {
+	x = 1;
+	var scroller = setInterval(function() {
+		if (x >= h) {
+			clearInterval(scroller);
+		}
+	    window.scroll(0, x);
+	    x = x + 15; //if you want to increase speed simply increase increment interval
+	}, 10);
+}
+  
+
+
 
   function loadData(cb) {
     d3.json('custom.geo.json', function(error, world) {
@@ -622,7 +906,11 @@
         cb(world, countries);
         d3.csv("indicator_gapminder_population.csv", function(pop_data){
           d3.csv("gapminder_children_per_woman_data.csv", function(error, fertility_data){
-            population_fertility_data(error, pop_data,fertility_data);
+             d3.csv("World_fertility_rate.csv", function(world_fertility_data){
+              population_fertility_data(error, pop_data,fertility_data,world_fertility_data);
+           
+
+            });
           });
         });
       });
