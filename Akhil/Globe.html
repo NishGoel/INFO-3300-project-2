@@ -11,7 +11,7 @@
   }
   #globe {
     cursor: pointer;
-    background: #555;
+    background: white;
   }
   #current {
     background: white;
@@ -286,16 +286,16 @@
       .style("text-anchor", "middle")
       .text("Fertility Rate");
 
-    svg.append("text")     
+    svg.append("text")
       .attr("y", 0 - margin.right - width +16.5)
       .attr("x",(height / 2))
       .attr("transform", "rotate(90)")
       .style("text-anchor", "middle")
       .text("Population (in Billions)");
 
-      svg.append("text")             
+      svg.append("text")
       .attr("transform",
-            "translate(" + (width/2) + " ," + 
+            "translate(" + (width/2) + " ," +
                            (height +33) + ")")
       .style("text-anchor", "middle")
       .text("Year");
@@ -324,11 +324,11 @@
 
 	//Graph Title
 	svg.append("text")
-        .attr("x", (width / 2))             
+        .attr("x", (width / 2))
         .attr("y", 0 - (margin.top / 2)+10)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px") 
-        .style("text-decoration", "underline")  
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
         .text(countryname);
         //Graph Title
 
@@ -473,7 +473,7 @@
 
         focus.select("line.y")                           // **********
             .attr("transform",                             // **********
-                  "translate(" + yearScale(d[0]) + ",12)"); 
+                  "translate(" + yearScale(d[0]) + ",12)");
 
         focus.select("text.y1")
             .attr("transform",
@@ -498,7 +498,7 @@
             .attr("transform",
             "translate(" + yearScale(d[0]) + "," +
                            popScale(d[1]) + ")");
-        
+
          focus.select("circle.y6")
             .attr("transform",
             "translate(" + yearScale(d[0]) + "," +
@@ -608,7 +608,7 @@
     var yearPop = 0;
     for (country in countryArray){
       //console.log(population[countryArray[country]][years[year]]);
-     
+
       yearPop = yearPop +  population[countryArray[country]][years[year]];
     }
     var arr = []
@@ -625,7 +625,7 @@
 
   console.log(worldData);
 
-  createInitialGraph(worldData);	
+  createInitialGraph(worldData);
 
   function createInitialGraph(worldData) {
 
@@ -650,7 +650,7 @@
 	var popScale = d3.scaleLinear()
 	                    .domain([0, 7500000000])
 	                    .range([height,0]);
-	  
+
 	var fertilityScale = d3.scaleLinear()
 	  .domain([0,10])
 	  .range([height,0])
@@ -677,16 +677,16 @@
       .style("text-anchor", "middle")
       .text("Fertility Rate");
 
-    svg.append("text")     
+    svg.append("text")
       .attr("y", 0 - margins.right - width +16.5)
       .attr("x",(height / 2))
       .attr("transform", "rotate(90)")
       .style("text-anchor", "middle")
       .text("Population (in Billions)");
 
-      svg.append("text")             
+      svg.append("text")
       .attr("transform",
-            "translate(" + (width/2) + " ," + 
+            "translate(" + (width/2) + " ," +
                            (height +33) + ")")
       .style("text-anchor", "middle")
       .text("Year");
@@ -715,11 +715,11 @@
 
 		//Graph Title
 	svg.append("text")
-        .attr("x", (width / 2))             
+        .attr("x", (width / 2))
         .attr("y", 0 - (margins.top / 2)+10)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px") 
-        .style("text-decoration", "underline")  
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
         .text("World Data");
         //Graph Title
 
@@ -806,7 +806,7 @@
 	div.style.top = 220;
 	div.innerHTML = "We want to tell a story about the world population and fertility rate";
 	div.style.opacity = 0;
-	document.getElementById("initial").appendChild(div); 
+	document.getElementById("initial").appendChild(div);
 	setTimeout(function() { unfade(div);}, 100);
 	var div1 = document.createElement("div");
 	div1.style.width = "200px";
@@ -832,7 +832,7 @@
 	div2.style.top = 475;
 	div2.innerHTML = "Soon after fertility rates quickly dropped, but population continued to grow at massive rates";
 	div2.style.opacity = 0;
-	document.getElementById("initial").appendChild(div2); 
+	document.getElementById("initial").appendChild(div2);
 	setTimeout(function() { unfade(div2);}, 5000);
 	var div3 = document.createElement("div");
 	div3.style.width = "200px";
@@ -846,10 +846,10 @@
 	div3.style.opacity = 0;
 	div3.innerHTML = "The world blames developing countries for not adjusting and causing this pandemic, but our charts will show you otherwise";
 	setTimeout(function() { unfade(div3);}, 7500);
-	document.getElementById("initial").appendChild(div3); 
+	document.getElementById("initial").appendChild(div3);
 	h = height+ margins.top+margins.bottom;
 	setTimeout(function() { scrollDown(h);}, 8000);
-	
+
   }
   //
 
@@ -894,21 +894,21 @@ function scrollDown(h) {
 	    x = x + 15; //if you want to increase speed simply increase increment interval
 	}, 10);
 }
-  
+
 
 
 
   function loadData(cb) {
-    d3.json('custom.geo.json', function(error, world) {
-      if (error) throw error
-      d3.tsv('countryID.tsv', function(error, countries) {
-        if (error) throw error
-        cb(world, countries);
         d3.csv("indicator_gapminder_population.csv", function(pop_data){
           d3.csv("gapminder_children_per_woman_data.csv", function(error, fertility_data){
              d3.csv("World_fertility_rate.csv", function(world_fertility_data){
               population_fertility_data(error, pop_data,fertility_data,world_fertility_data);
-           
+              d3.json('custom.geo.json', function(error, world) {
+                if (error) throw error
+                d3.tsv('countryID.tsv', function(error, countries) {
+                  if (error) throw error
+                  cb(world, countries);
+
 
             });
           });
