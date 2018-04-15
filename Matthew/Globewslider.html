@@ -3,6 +3,7 @@
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.js"></script>
   <script src="versor.js"></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>
   <style>
   html, body {
     margin: 0;
@@ -197,6 +198,24 @@
     var svgwidth = document.documentElement.clientWidth/2;
     var svgheight = (document.documentElement.clientHeight)*.2;
 
+    var slider = d3.sliderHorizontal()
+    .min(1950)
+    .max(2015)
+    .step(1)
+    .width((document.documentElement.clientWidth*6)/16)
+    .tickFormat(d3.format("d"))
+    .displayValue(false)
+    .on('onchange', val => {
+      currentYear = val;
+      render();
+    });
+
+    d3.select("#svgSlider").append("svg")
+      .attr("width", svgwidth)
+      .attr("height", svgheight)
+      .append("g")
+      .attr("transform", "translate("+ document.documentElement.clientWidth/16+",30)")
+      .call(slider);
   }
 
 //////////////////////////////////////////////////////////////////////
