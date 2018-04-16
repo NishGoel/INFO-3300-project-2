@@ -159,22 +159,22 @@
   //for shading of the countries
 
   function buildPlay(){
-    d3.select(".colorSlider").append("rect")
+    var button = d3.select(".colorSlider").append("rect")
     .attr("height",30)
-    .attr("width",30)
-    .style("border","black")
+    .attr("width",40)
+    .attr("x",30)
+    .attr("y",15)
     .on("click", function(){
       if(!playclick){
          degPerMs = 0;
-         //pause = true;
          playclick = true;
       }
       else{
         degPerMs = .003;
-        //pause = false;
         playclick = false;
       }
-    });
+    })
+    .style("border","black");
   }
 
   function render() {
@@ -720,7 +720,7 @@
 
     countryList = cList
 
-    window.addEventListener('resize', scale)
+    //window.addEventListener('resize', scale)
     scale();
     buildSlider();
     buildPlay();
