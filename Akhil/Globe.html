@@ -13,6 +13,7 @@
   #globe {
     cursor: pointer;
     background: white;
+    border: 1px solid black;
   }
   #current {
     background: white;
@@ -27,7 +28,7 @@
 <body>
   <div id = "initial" style="display: block;"></div>
   <div style="margin-top: 15px">
-	  <h2 id="current" style="text-align: center;"></h2>
+	  <h2 id="current" style="text-align: center;">Select a Country!</h2>
 	  <canvas id="globe" ></canvas>
     <svg id = "keys1">
       <defs>
@@ -939,12 +940,12 @@
 	div1.style.position = "absolute";
 	div1.style.color = "red";
 	div1.style.zIndex = 3;
-	div1.style.left = 600;
-	div1.style.top = 300;
-	div1.innerHTML = "Post WWII, fertility rates were at an all time high, even here in America with the return of the baby boomers";
+	div1.style.left = 800;
+	div1.style.top = 250;
+	div1.innerHTML = "In the last century, due to better healthcare, the mortality rate declined, leading to rapid increase in population.";
 	div1.style.opacity = 0;
 	document.getElementById("initial").appendChild(div1);
-	setTimeout(function() { unfade(div1);}, 2500);
+	setTimeout(function() { unfade(div1);}, 4100);
 	var div2 = document.createElement("div");
 	div2.style.width = "200px";
 	div2.style.height = "75";
@@ -954,10 +955,10 @@
 	div2.style.zIndex = 3;
 	div2.style.left = 100;
 	div2.style.top = 475;
-	div2.innerHTML = "Soon after fertility rates quickly dropped, but population continued to grow at massive rates";
+	div2.innerHTML = "The world realized these changes, and fertility rates quickly dropped, but populations continued to grow steadily.";
 	div2.style.opacity = 0;
 	document.getElementById("initial").appendChild(div2);
-	setTimeout(function() { unfade(div2);}, 5000);
+	setTimeout(function() { unfade(div2);}, 12100);
 	var div3 = document.createElement("div");
 	div3.style.width = "200px";
 	div3.style.height = "75";
@@ -965,14 +966,27 @@
 	div3.style.position = "absolute";
 	div3.style.color = "red";
 	div3.style.zIndex = 3;
-	div3.style.left = 600;
-	div3.style.top = 575;
+	div3.style.left = 900;
+	div3.style.top = 300;
 	div3.style.opacity = 0;
-	div3.innerHTML = "The world blames developing countries for not adjusting and causing this pandemic, but our charts will show you otherwise";
-	setTimeout(function() { unfade(div3);}, 7500);
+	div3.innerHTML = "At loss, the world began to blame developing countries for not adjusting and subsequently causing this population explosion, but the problem has already been solved.";
+	setTimeout(function() { unfade(div3);}, 20100);
 	document.getElementById("initial").appendChild(div3);
+  var div4 = document.createElement("div");
+	div4.style.width = "200px";
+	div4.style.height = "75";
+	div4.style.background = "white";
+	div4.style.position = "absolute";
+	div4.style.color = "red";
+	div4.style.zIndex = 3;
+	div4.style.left = 600;
+	div4.style.top = 800;
+	div4.style.opacity = 0;
+	div4.innerHTML = "Don't believe us? Check out our country-wise charts.";
+	setTimeout(function() { unfade(div4);}, 26100);
+	document.getElementById("initial").appendChild(div4);
 	h = height+ margins.top+margins.bottom;
-	setTimeout(function() { scrollDown(h);}, 8000);
+	setTimeout(function() { scrollDown(h);},30000);
 
   }
   //
@@ -991,7 +1005,7 @@ function unfade(element) { //from StackOverflow
     }, 10);
     setTimeout(function() {
 	    fade(element);
-	}, 2900)
+	}, 5100)
 }
 
 function fade(element) {
