@@ -32,8 +32,8 @@
     <svg id = "keys1">
       <defs>
           <linearGradient id="colorGradient" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stop-color="blue"/>
-            <stop offset="100%" stop-color="red"/>
+            <stop offset="10%" stop-color="red"/>
+            <stop offset="100%" stop-color="blue"/>
           </linearGradient>
 
         </defs>
@@ -220,7 +220,7 @@
       }
     }
   }
-  var color = d3.scaleLinear().domain([1,8])
+  var color = d3.scaleLinear().domain([1,9])
       .interpolate(d3.interpolateHcl)
       .range([d3.color("blue"),d3.color("red") ]);
 //d3.rgb(""#E500C8"")
@@ -258,14 +258,7 @@
       // .attr("transform", "translate("+ document.documentElement.clientWidth/16+",30)")
     //var svg = d3.select(svg);
 
-    // var textLabel = svg.append("text")
-    //     .text("Fertility rate")
-    //     .attr("x", "250")
-    //     .attr("y", "50")
-    //     .attr("text-anchor", "middle")
-    //     .attr("alignment-baseline", "middle")
-    //     .attr("font-size", "15");
-
+       
     //Creating gradient for happiness
 
     var gradient = svg.append("g")
@@ -280,7 +273,47 @@
         .attr("fill", "url(#colorGradient)")
         .attr("rx", "20")
         .attr("rx", "20")
-        .attr("transform", "rotate(90, 30, 0)");
+        .attr("transform", "rotate(90, 50, 0)");
+
+    // var textlabel = svg.append("g")
+    // .attr("id", "textlabel")
+    // .attr("transform", "translate (0, 800");
+
+     svg.append("text")
+        .text("Fertility rate")
+        .attr("x", "0")
+        .attr("y", svgheight/2)
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", "12")
+        .attr("transform", "rotate(270, 10," + svgheight/2 + ")");
+
+    svg.append("text")
+        .text("10")
+        .attr("x", "70")
+        .attr("y", "110")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", "12")
+
+    svg.append("text")
+        .text("5.5")
+        .attr("x", "70")
+        .attr("y", "310")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", "12")
+
+    svg.append("text")
+        .text("1")
+        .attr("x", "70")
+        .attr("y", "500")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", "12")
+        //.attr("transform", "rotate(270, 10," + svgheight/2 + ")");
+
+
 
     // var gradient = svg.append("rect")
     //     .attr("x", "0")
