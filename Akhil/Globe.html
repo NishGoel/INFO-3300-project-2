@@ -16,19 +16,21 @@
   #current {
     background: white;
     border: 2px solid black;
-    position: absolute;
     color: black;
     font-family: sans-serif;
     margin-left: 4%;
-    margin-top: 4%;
+    margin-top: 6%;
+    margin-right: 4%
   }
   </style>
 </head>
 <body>
-  <div id = "initial"></div>
-  <div id = "svgTimeSeries" style="float: right"></div>
+  <div id = "initial" style="display: block;"></div>
   <h2 id="current"></h2>
-  <canvas id="globe"></canvas>
+  <div>
+  <canvas id="globe" ></canvas>
+  <div id = "svgTimeSeries" style="float: right"></div>
+  </div>
   <script>
   //
   // Configuration
@@ -628,14 +630,12 @@
   createInitialGraph(worldData);
 
   function createInitialGraph(worldData) {
-
-  	width = document.documentElement.clientWidth;
-  	height = document.documentElement.clientHeight;
-  	document.getElementById("initial").style.width = width;
-  	document.getElementById("initial").style.height = height;
-  	var margins = {top: 30, right: 60, bottom: 40, left: 35}, //changed this
+  	
+  	var margins = {top: 30, right: 60, bottom: 40, left: 40}, //changed this
     width = document.documentElement.clientWidth - margins.left - margins.right,
-    height = document.documentElement.clientHeight/2 - margins.top - margins.bottom;
+    height = document.documentElement.clientHeight - margins.top - margins.bottom;
+    document.getElementById("initial").style.width = width;
+  	document.getElementById("initial").style.height = height;
   	var svg = d3.select("#initial").append("svg")
 			    .attr("width", width + margins.left + margins.right)
 			    .attr("height", height + margins.top + margins.bottom)
@@ -671,7 +671,7 @@
 //labels
     svg.append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margins.left - 2)
+      .attr("y", 0 - margins.left +5)
       .attr("x",0 - (height / 2))
       .attr("dy", "1em")
       .style("text-anchor", "middle")
