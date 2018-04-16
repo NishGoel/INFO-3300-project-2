@@ -221,7 +221,7 @@
       }
     }
   }
-  var color = d3.scaleLinear().domain([1,8])
+  var color = d3.scaleLinear().domain([1,10])
       .interpolate(d3.interpolateHcl)
       .range([d3.color("blue"),d3.color("red") ]);
 //d3.rgb(""#E500C8"")
@@ -980,7 +980,7 @@
 	div4.style.color = "red";
 	div4.style.zIndex = 3;
 	div4.style.left = 600;
-	div4.style.top = 800;
+	div4.style.top = 450;
 	div4.style.opacity = 0;
 	div4.innerHTML = "Don't believe us? Check out our country-wise charts.";
 	setTimeout(function() { unfade(div4);}, 26100);
