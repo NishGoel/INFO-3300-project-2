@@ -29,24 +29,24 @@
   <div style="margin-top: 15px">
 	  <h2 id="current" style="text-align: center;"></h2>
 	  <canvas id="globe" ></canvas>
-	  <div id = "svgTimeSeries" style="float: right"></div>
-	  <div id = "svgSlider"></div>
     <svg id = "keys1">
       <defs>
           <linearGradient id="colorGradient" x1="0" x2="1" y1="0" y2="0">
             <stop offset="0%" stop-color="blue"/>
             <stop offset="100%" stop-color="red"/>
           </linearGradient>
-          
+
         </defs>
     </svg>
+	  <div id = "svgTimeSeries" style="float: right"></div>
+	  <div id = "svgSlider"></div>
       <!-- <svg height= screen.height/2 width = screen.width/16 class="key" id="keys1">
         <defs>
           <linearGradient id="colorGradient" x1="0" x2="1" y1="0" y2="0">
             <stop offset="0%" stop-color="blue"/>
             <stop offset="100%" stop-color="red"/>
           </linearGradient>
-          
+
         </defs>
       </svg> -->
   </div>
@@ -141,7 +141,7 @@
   }
 
   function scale() {
-    width = document.documentElement.clientWidth/2
+    width = (document.documentElement.clientWidth)*5/12
     height = screen.height * .6;
     originalScale = height / 2.1;
     scalevar = originalScale;
@@ -244,14 +244,16 @@
 
   function makeColorScale() {
 
-    svgwidth = screen.width/8;
-    svgheight = screen.height;
+    svgwidth = screen.width/16;
+    svgheight = screen.height*6/10;
 
     var svg = d3.select("#keys1");
 
     svg = svg.attr("class","colorScale")
       .attr("width", svgwidth)
       .attr("height", svgheight)
+      //.append("g")
+      //.attr("transform", "translate("+ screen.width/16+",-30)")
       // .append("g")
       // .attr("transform", "translate("+ document.documentElement.clientWidth/16+",30)")
     //var svg = d3.select(svg);
@@ -279,14 +281,14 @@
   }
 
   function buildSlider(){
-    var svgwidth = document.documentElement.clientWidth/2;
-    var svgheight = (document.documentElement.clientHeight)*.2;
+    var svgwidth = screen.width*5/12;
+    var svgheight = (screen.height)*.2;
 
     var slider = d3.sliderHorizontal()
     .min(1950)
     .max(2015)
     .step(1)
-    .width((document.documentElement.clientWidth*6)/16)
+    .width((screen.width*5)/16)
     .tickFormat(d3.format("d"))
     .displayValue(false)
     .on('onchange', val => {
@@ -299,7 +301,7 @@
       .attr("width", svgwidth)
       .attr("height", svgheight)
       .append("g")
-      .attr("transform", "translate("+ document.documentElement.clientWidth/16+",30)")
+      .attr("transform", "translate("+ screen.width/16+",30)")
       .call(slider);
 
     return svg;
@@ -1133,6 +1135,7 @@ function scrollDown(h) {
     var svg = buildSlider();
     buildPlay(svg);
     makeColorScale();
+
     autorotate = d3.timer(rotate)
   })
   </script>
