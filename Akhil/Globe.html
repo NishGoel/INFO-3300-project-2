@@ -164,7 +164,6 @@
   }
 
   function buildPlay(svg){
-
     var button = d3.select(".colorSlider").append("rect")
     .attr("height",20)
     .attr("width",20)
@@ -174,15 +173,17 @@
       if(!playclick){
          degPerMs = 0;
          playclick = true;
+         d3.select(this).style("fill", "green");
       }
       else{
         degPerMs = .003;
         playclick = false;
+        d3.select(this).style("fill", "red");
       }
     })
     .style("stroke","black")
     .style("stroke-width", 5)
-    .style("fill", "blue");
+    .style("fill", "red");
   }
 
   function render() {
