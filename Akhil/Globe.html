@@ -74,7 +74,7 @@
   // Variables
   //
 
-  
+
   var canvas = d3.select('#globe')
   var context = canvas.node().getContext('2d')
   var water = {type: 'Sphere'}
@@ -228,7 +228,7 @@
 
 
   var margin = {top: 30, right: 60, bottom: 40, left: 35}, //changed this
-    width = (screen.width/2 - margin.left - margin.right) -10,
+    width = (screen.width/2 - margin.left - margin.right) -20,
     height = (screen.height - margin.top - margin.bottom) * .7;
 
   yearPop = d3.extent(yearPop);
@@ -623,7 +623,7 @@
   createInitialGraph(worldData);
 
   function createInitialGraph(worldData) {
-  	
+
   	var margins = {top: 30, right: 60, bottom: 40, left: 40}, //changed this
     width = screen.width - margins.left - margins.right,
     height = screen.height - margins.top - margins.bottom *5;
