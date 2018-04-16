@@ -3,6 +3,7 @@
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.js"></script>
   <script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
   <script src="versor.js"></script>
   <style>
   html, body {
@@ -26,9 +27,10 @@
 <body>
   <div id = "initial" style="display: block;"></div>
   <div style="margin-top: 15px">
-  <h2 id="current" style="text-align: center;"></h2>
-  <canvas id="globe" ></canvas>
-  <div id = "svgTimeSeries" style="float: right"></div>
+	  <h2 id="current" style="text-align: center;"></h2>
+	  <canvas id="globe" ></canvas>
+	  <div id = "svgTimeSeries" style="float: right"></div>
+	  <div id = "svgSlider"></div>
   </div>
   <script>
   //
@@ -99,6 +101,8 @@
   var originalScale;
   var scalevar;
   var countryName;
+  var currentYear = 1950;
+  var playclick = false;
   ////////
 
   //data Variables
@@ -120,7 +124,7 @@
 
   function scale() {
     width = document.documentElement.clientWidth/2
-    height = screen.height * .75;
+    height = screen.height * .6;
     originalScale = height / 2.1;
     scalevar = originalScale;
     canvas.attr('width', width).attr('height', height)
@@ -159,11 +163,30 @@
     startRotation()
   }
 
+  function buildPlay(){
+    var button = d3.select(".colorSlider").append("rect")
+    .attr("height",30)
+    .attr("width",40)
+    .attr("x",30)
+    .attr("y",15)
+    .on("click", function(){
+      if(!playclick){
+         degPerMs = 0;
+         playclick = true;
+      }
+      else{
+        degPerMs = .003;
+        playclick = false;
+      }
+    })
+    .style("border","black");
+  }
+
   function render() {
     context.clearRect(0, 0, width, height)
     fill(water, colorWater)
     stroke(graticule, colorGraticule)
-    fill(countries, colorLand)
+    countryFill(countries,currentYear);
     stroke(borders, "white")
     if(!pause){
       if (currentCountry) {
@@ -174,6 +197,52 @@
         fill(clickedCountry, colorCountry)
       }
     }
+  }
+  var color = d3.scaleLinear().domain([1,8])
+      .interpolate(d3.interpolateHcl)
+      .range([d3.color("blue"),d3.color("red") ]);
+//d3.rgb(""#E500C8"")
+//d3.rgb()
+  function countryFill(countries,year){
+    var fillcolor = '';
+    countries["features"].forEach(function(d){
+      var speccountry = countryList.find(function(c) {
+        return c.id === d.id;
+      })
+      try{
+        fillcolor = color(fertility[speccountry.name][year]);
+      } catch(error){
+        //console.log(error)
+        fillcolor = "black";
+      }
+      fill(d,fillcolor);
+    })
+  }
+
+
+  function buildSlider(){
+    var svgwidth = document.documentElement.clientWidth/2;
+    var svgheight = (document.documentElement.clientHeight)*.2;
+
+    var slider = d3.sliderHorizontal()
+    .min(1950)
+    .max(2015)
+    .step(1)
+    .width((document.documentElement.clientWidth*6)/16)
+    .tickFormat(d3.format("d"))
+    .displayValue(false)
+    .on('onchange', val => {
+      currentYear = val;
+      render();
+    });
+
+    d3.select("#svgSlider").append("svg")
+      .attr("class","colorslider")
+      .attr("width", svgwidth)
+      .attr("height", svgheight)
+      .append("g")
+      .attr("transform", "translate("+ document.documentElement.clientWidth/16+",30)")
+      .call(slider);
   }
 
   function fill(obj, color) {
@@ -1000,8 +1069,10 @@ function scrollDown(h) {
 
     countryList = cList
 
-    window.addEventListener('resize', scale)
+    //window.addEventListener('resize', scale)
     scale()
+    buildSlider();
+    buildPlay();
     autorotate = d3.timer(rotate)
   })
   </script>
