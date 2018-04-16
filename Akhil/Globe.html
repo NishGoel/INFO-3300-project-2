@@ -19,14 +19,13 @@
     color: black;
     font-family: sans-serif;
     margin-left: 4%;
-    margin-top: 6%;
     margin-right: 4%
   }
   </style>
 </head>
 <body>
   <div id = "initial" style="display: block;"></div>
-  <div>
+  <div style="margin-top: 15px">
   <h2 id="current" style="text-align: center;"></h2>
   <canvas id="globe" ></canvas>
   <div id = "svgTimeSeries" style="float: right"></div>
@@ -120,7 +119,7 @@
   }
 
   function scale() {
-    width = screen.width/2
+    width = document.documentElement.clientWidth/2
     height = screen.height * .75;
     originalScale = height / 2.1;
     scalevar = originalScale;
@@ -228,7 +227,7 @@
 
 
   var margin = {top: 30, right: 60, bottom: 40, left: 35}, //changed this
-    width = (screen.width/2 - margin.left - margin.right) -20,
+    width = (document.documentElement.clientWidth/2 - margin.left - margin.right) -20,
     height = (screen.height - margin.top - margin.bottom) * .7;
 
   yearPop = d3.extent(yearPop);
@@ -625,10 +624,10 @@
   function createInitialGraph(worldData) {
 
   	var margins = {top: 30, right: 60, bottom: 40, left: 40}, //changed this
-    width = screen.width - margins.left - margins.right,
-    height = screen.height - margins.top - margins.bottom *5;
+    width = document.documentElement.clientWidth - margins.left - margins.right,
+    height = document.documentElement.clientHeight - margins.top - margins.bottom;
     document.getElementById("initial").style.width = width;
-  	document.getElementById("initial").style.height = height;
+  	document.getElementById("initial").style.height = document.documentElement.clientHeight;
   	var svg = d3.select("#initial").append("svg")
 			    .attr("width", width + margins.left + margins.right)
 			    .attr("height", height + margins.top + margins.bottom)
