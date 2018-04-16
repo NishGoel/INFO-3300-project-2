@@ -31,6 +31,24 @@
 	  <canvas id="globe" ></canvas>
 	  <div id = "svgTimeSeries" style="float: right"></div>
 	  <div id = "svgSlider"></div>
+    <svg id = "keys1">
+      <defs>
+          <linearGradient id="colorGradient" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stop-color="blue"/>
+            <stop offset="100%" stop-color="red"/>
+          </linearGradient>
+          
+        </defs>
+    </svg>
+      <!-- <svg height= screen.height/2 width = screen.width/16 class="key" id="keys1">
+        <defs>
+          <linearGradient id="colorGradient" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stop-color="blue"/>
+            <stop offset="100%" stop-color="red"/>
+          </linearGradient>
+          
+        </defs>
+      </svg> -->
   </div>
   <script>
   //
@@ -223,6 +241,41 @@
     })
   }
 
+  function makeColorScale() {
+
+    svgwidth = screen.width/8;
+    svgheight = screen.height;
+
+    var svg = d3.select("#keys1");
+
+    svg = svg.attr("class","colorScale")
+      .attr("width", svgwidth)
+      .attr("height", svgheight)
+      // .append("g")
+      // .attr("transform", "translate("+ document.documentElement.clientWidth/16+",30)")
+    //var svg = d3.select(svg);
+
+    // var textLabel = svg.append("text")
+    //     .text("Fertility rate")
+    //     .attr("x", "250")
+    //     .attr("y", "50")
+    //     .attr("text-anchor", "middle")
+    //     .attr("alignment-baseline", "middle")
+    //     .attr("font-size", "15");
+
+    //Creating gradient for happiness
+    var gradient = svg.append("rect")
+        .attr("x", "0")
+        .attr("y", "0")
+        .attr("width", "500")
+        .attr("height", "30")
+        .attr("fill", "url(#colorGradient)")
+        .attr("rx", "20")
+        .attr("rx", "20")
+        .attr("transform", "rotate(90, 40, 40)")
+        //.attr("transform", "translate(10,0)");
+
+  }
 
   function buildSlider(){
     var svgwidth = document.documentElement.clientWidth/2;
@@ -1072,13 +1125,13 @@ function scrollDown(h) {
     land = topojson.feature(world, world.objects.land)
     countries = topojson.feature(world, world.objects.countries)
     borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }),
-
     countryList = cList
 
     //window.addEventListener('resize', scale)
     scale()
     var svg = buildSlider();
     buildPlay(svg);
+    makeColorScale();
     autorotate = d3.timer(rotate)
   })
   </script>
