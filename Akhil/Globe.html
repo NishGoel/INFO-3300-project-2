@@ -119,7 +119,7 @@
   var originalScale;
   var scalevar;
   var countryName;
-  var currentYear = 1950;
+  var currentYear = 2015;
   var playclick = false;
   ////////
 
@@ -288,6 +288,7 @@
     .min(1950)
     .max(2015)
     .step(1)
+    .default(2015)
     .width((screen.width*5)/16)
     .tickFormat(d3.format("d"))
     .displayValue(false)
