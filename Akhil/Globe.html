@@ -210,7 +210,8 @@
         return c.id === d.id;
       })
       try{
-        fillcolor = color(fertility[speccountry.name][year]);
+        if(fertility[speccountry.name][year] == 0) fillcolor = black;
+        else fillcolor = color(fertility[speccountry.name][year]);
       } catch(error){
         //console.log(error)
         fillcolor = "black";
