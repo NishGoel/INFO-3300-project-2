@@ -95,6 +95,7 @@
   var scalevar;
   var countryName;
   var currentYear = 1950;
+  var playclick = false;
   ////////
 
   //data Variables
@@ -157,6 +158,25 @@
 
   //for shading of the countries
 
+  function buildPlay(){
+    d3.select(".colorSlider").append("rect")
+    .attr("height",30)
+    .attr("width",30)
+    .style("border","black")
+    .on("click", function(){
+      if(!playclick){
+         degPerMs = 0;
+         //pause = true;
+         playclick = true;
+      }
+      else{
+        degPerMs = .003;
+        //pause = false;
+        playclick = false;
+      }
+    });
+  }
+
   function render() {
     context.clearRect(0, 0, width, height)
     fill(water, colorWater)
@@ -173,10 +193,11 @@
       }
     }
   }
-  var color = d3.scaleLinear().domain([1,10])
+  var color = d3.scaleLinear().domain([1,8])
       .interpolate(d3.interpolateHcl)
-      .range([d3.rgb("#E500C8"), d3.rgb('#ECEC09')]);
-
+      .range([d3.color("blue"),d3.color("red") ]);
+//d3.rgb(""#E500C8"")
+//d3.rgb()
   function countryFill(countries,year){
     var fillcolor = '';
     countries["features"].forEach(function(d){
@@ -211,6 +232,7 @@
     });
 
     d3.select("#svgSlider").append("svg")
+      .attr("class","colorslider")
       .attr("width", svgwidth)
       .attr("height", svgheight)
       .append("g")
@@ -701,6 +723,7 @@
     window.addEventListener('resize', scale)
     scale();
     buildSlider();
+    buildPlay();
     autorotate = d3.timer(rotate);
   })
   </script>
