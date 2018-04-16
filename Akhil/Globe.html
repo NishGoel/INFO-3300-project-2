@@ -27,7 +27,7 @@
 <body>
   <div id = "initial" style="display: block;"></div>
   <div>
-  <h2 id="current"></h2>
+  <h2 id="current" style="text-align: center;"></h2>
   <canvas id="globe" ></canvas>
   <div id = "svgTimeSeries" style="float: right"></div>
   </div>
@@ -46,6 +46,8 @@
   var colorLand = '#111'
   var colorGraticule = '#ccc'
   var colorCountry = '#0ad'
+  var current = d3.select('#current');
+  var elem = document.getElementById("current");
 
 
   //
@@ -53,6 +55,8 @@
   //
 
   function enter(country) {
+
+  	elem.style.color = "black";
     var country = countryList.find(function(c) {
       return c.id === country.id
     })
@@ -61,7 +65,8 @@
   }
 
   function leave(country) {
-    current.text('')
+    current.text('afeioj');
+    elem.style.color = "white";
     countryName = '';
   }
 
@@ -69,7 +74,7 @@
   // Variables
   //
 
-  var current = d3.select('#current')
+  
   var canvas = d3.select('#globe')
   var context = canvas.node().getContext('2d')
   var water = {type: 'Sphere'}
@@ -223,7 +228,7 @@
 
 
   var margin = {top: 30, right: 60, bottom: 40, left: 35}, //changed this
-    width = screen.width/2 - margin.left - margin.right,
+    width = (screen.width/2 - margin.left - margin.right) -10,
     height = (screen.height - margin.top - margin.bottom) * .7;
 
   yearPop = d3.extent(yearPop);
@@ -321,17 +326,6 @@
 	    .attr("fill", function (d, i) {return color_scale[i]; })
 	    .attr("width", 10).attr("height", 10);
 
-	//legend
-
-	//Graph Title
-	svg.append("text")
-        .attr("x", (width / 2))
-        .attr("y", 0 - (margin.top / 2)+10)
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .style("text-decoration", "underline")
-        .text(countryname);
-        //Graph Title
 
     var pointsarray = [];
       resultArray.forEach(function(d){
